@@ -1,7 +1,7 @@
 {
   description = "WPEWebKit Library";
 
-  inputs.nixpkgs.url = "nixpkgs/nixos-25.11";
+  inputs.nixpkgs.url = "github:NixOS/nixpkgs";
 
   outputs =
     { nixpkgs, ... }:
