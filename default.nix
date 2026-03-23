@@ -75,6 +75,7 @@
   fetchpatch,
   port ? "wpe",
   fetchurl,
+  libinput,
   ...
 }:
 
@@ -165,6 +166,7 @@ clangStdenv.mkDerivation (finalAttrs: {
     libwpe
     libjpeg
     woff2
+    libinput
   ]
   ++ lib.optionals clangStdenv.hostPlatform.isBigEndian [
     # https://bugs.webkit.org/show_bug.cgi?id=274032
@@ -213,6 +215,10 @@ clangStdenv.mkDerivation (finalAttrs: {
       "-DUSE_GTK4=OFF"
       "-DENABLE_GTKDOC=OFF"
       "-DENABLE_EXPERIMENTAL_FEATURES=${cmakeBool enableExperimental}"
+      "-DENABLE_WPE_PLATFORM=ON"
+      "-DENABLE_WPE_PLATFORM_DRM=ON"
+      "-DENABLE_WPE_PLATFORM_HEADLESS=ON"
+      "-DENABLE_WPE_PLATFORM_WAYLAND=ON"
     ]
     ++ lib.optionals clangStdenv.hostPlatform.isLinux [
       # Have to be explicitly specified when cross.
