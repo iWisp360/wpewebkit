@@ -230,14 +230,11 @@ clangStdenv.mkDerivation (finalAttrs: {
       "-DUSE_GTK4=OFF"
       "-DENABLE_GTKDOC=OFF"
       "-DENABLE_EXPERIMENTAL_FEATURES=${cmakeBool enableExperimental}"
-      "-DENABLE_MINIBROWSER=ON"
-      "-DENABLE_SPEECH_SYNTHESIS=OFF"
       "-DUSE_FLITE=OFF"
       "-DUSE_LIBBACKTRACE=OFF"
+      "-DENABLE_MINIBROWSER=ON"
+      "-DENABLE_SPEECH_SYNTHESIS=OFF"
       "-DENABLE_WPE_PLATFORM=ON"
-      "-DENABLE_WPE_PLATFORM_DRM=ON"
-      "-DENABLE_WPE_PLATFORM_HEADLESS=OFF"
-      "-DENABLE_WPE_PLATFORM_WAYLAND=ON"
     ]
     ++ lib.optionals clangStdenv.hostPlatform.isLinux [
       # Have to be explicitly specified when cross.
