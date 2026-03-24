@@ -15,6 +15,8 @@
   libgpg-error,
   wayland,
   wayland-protocols,
+  elfutils,
+  zstd,
   wayland-scanner,
   libwebp,
   enchant,
@@ -22,12 +24,14 @@
   libxkbcommon,
   libavif,
   libepoxy,
+  libxdmcp,
   libjxl,
   at-spi2-core,
   cairo,
   expat,
   libxml2,
   libwpe,
+  libwpe-fdo,
   libjpeg,
   libsoup_3,
   libsecret,
@@ -50,7 +54,6 @@
   lcms2,
   libmanette,
   geoclue2,
-  flite,
   fontconfig,
   freetype,
   openssl,
@@ -60,8 +63,8 @@
   woff2,
   bubblewrap,
   libseccomp,
-  libbacktrace,
   systemdLibs,
+  libunwind,
   xdg-dbus-proxy,
   replaceVars,
   glib,
@@ -76,6 +79,9 @@
   port ? "wpe",
   fetchurl,
   libinput,
+  pcre2,
+  gi-docgen,
+  gobject-introspection,
   ...
 }:
 
@@ -88,6 +94,11 @@ clangStdenv.mkDerivation (finalAttrs: {
   # https://github.com/NixOS/nixpkgs/issues/153528
   # Can't be linked within a 4GB address space.
   separateDebugInfo = clangStdenv.hostPlatform.isLinux && !clangStdenv.hostPlatform.is32bit;
+
+  outputs = [
+    "out"
+    "dev"
+  ];
 
   src = fetchurl {
     url = "https://wpewebkit.org/releases/wpewebkit-${finalAttrs.version}.tar.xz";
@@ -129,11 +140,11 @@ clangStdenv.mkDerivation (finalAttrs: {
   ];
 
   buildInputs = [
+    zstd
     at-spi2-core
     cairo # required even when using skia
     enchant
     expat
-    flite
     libavif
     libepoxy
     libjxl
@@ -151,6 +162,11 @@ clangStdenv.mkDerivation (finalAttrs: {
     libidn
     libintl
     lcms2
+    pcre2
+    gobject-introspection
+    gi-docgen
+    libxdmcp
+    libwpe-fdo
     libpthread-stubs
     libsysprof-capture
     libtasn1
@@ -158,7 +174,6 @@ clangStdenv.mkDerivation (finalAttrs: {
     libxkbcommon
     libxml2
     libxslt
-    libbacktrace
     nettle
     p11-kit
     sqlite
@@ -167,6 +182,10 @@ clangStdenv.mkDerivation (finalAttrs: {
     libjpeg
     woff2
     libinput
+    libunwind
+    openssl
+    elfutils
+    openxr-loader
   ]
   ++ lib.optionals clangStdenv.hostPlatform.isBigEndian [
     # https://bugs.webkit.org/show_bug.cgi?id=274032
@@ -189,12 +208,6 @@ clangStdenv.mkDerivation (finalAttrs: {
   ++ lib.optionals enableGeoLocation [
     geoclue2
   ]
-  ++ lib.optionals enableExperimental [
-    # For ENABLE_WEB_RTC
-    openssl
-    # For ENABLE_WEBXR
-    openxr-loader
-  ]
   ++ lib.optionals withLibsecret [
     libsecret
   ];
@@ -208,13 +221,17 @@ clangStdenv.mkDerivation (finalAttrs: {
       cmakeBool = x: if x then "ON" else "OFF";
     in
     [
-      "-DENABLE_INTROSPECTION=OFF"
+      "-DENABLE_WEB_RTC=ON"
       "-DPORT=${lib.toUpper port}"
       "-DUSE_SOUP2=${cmakeBool false}"
       "-DUSE_LIBSECRET=${cmakeBool withLibsecret}"
       "-DUSE_GTK4=OFF"
       "-DENABLE_GTKDOC=OFF"
       "-DENABLE_EXPERIMENTAL_FEATURES=${cmakeBool enableExperimental}"
+      "-DENABLE_MINIBROWSER=ON"
+      "-DENABLE_SPEECH_SYNTHESIS=OFF"
+      "-DUSE_FLITE=OFF"
+      "-DUSE_LIBBACKTRACE=OFF"
       "-DENABLE_WPE_PLATFORM=ON"
       "-DENABLE_WPE_PLATFORM_DRM=ON"
       "-DENABLE_WPE_PLATFORM_HEADLESS=ON"
